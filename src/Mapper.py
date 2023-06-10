@@ -78,11 +78,10 @@ class Mapper(object):
         self.use_bound = cfg['use_bound']
         self.encode_exposure = cfg['model']['encode_exposure']
 
+        # stores max and min sampling radii for different levels
         self.radius_hierarchy = cfg['pointcloud']['radius_hierarchy']
         
-        #self.fine_iter_ratio = cfg['mapping']['fine_iter_ratio']
-        #self.middle_iter_ratio = cfg['mapping']['middle_iter_ratio']
-        
+        # ratios of geometry/color iterations for each frame
         self.geo_iter_ratio = cfg['mapping']['geo_iter_ratio']
         self.col_iter_ratio = cfg['mapping']['col_iter_ratio']
         
@@ -137,7 +136,6 @@ class Mapper(object):
         self.min_iter_ratio = cfg['mapping']['min_iter_ratio']
 
         
-
         if self.save_selected_keyframes_info:
             self.selected_keyframes = {}
 
@@ -157,8 +155,7 @@ class Mapper(object):
                                      vis_inside=self.vis_inside, total_iters=self.num_joint_iters,
                                      img_dir=os.path.join(self.output, 'rendered_image'))
         self.H, self.W, self.fx, self.fy, self.cx, self.cy = slam.H, slam.W, slam.fx, slam.fy, slam.cx, slam.cy
-        # self.npc_geo_feats = dict.fromkeys(self.radius_hierarchy.keys(), {})
-        # self.npc_col_feats = dict.fromkeys(self.radius_hierarchy.keys(), {})
+
         self.npc_geo_feats_fine = None
         self.npc_geo_feats_mid = None
         self.npc_col_feats = None
