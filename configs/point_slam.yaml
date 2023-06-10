@@ -1,0 +1,217 @@
+coarse: True # use coarse grid or not
+sync_method: strict # strict | loose | free
+scale: 1 # only used by imap
+verbose: True # will use tqdm
+occupancy: True # always true
+low_gpu_mem: True # empty cuda cache after each optimization loop for tracker and mapper
+use_normals: False # if use point normals in color decoder
+use_view_direction: False # if use viewing direction in color decoder, can't be enabled if use normals
+use_dynamic_radius: True # if to choose radius_add and radius_query dynamically based on color gradients
+wandb: False
+project_name: "Point_SLAM" # for wandb init
+project_name_with_gt: "mapper_gt_depth" # for wandb init
+use_bound: False
+bound_divisible: 0.32 # not used
+wandb_dir: "/cluster/scratch/liuqing/3DVoutput/point-slam/output/"
+model:
+  c_dim: 32 # feature dimension
+  exposure_dim: 8
+  coarse_bound_enlarge: 2 # enlarge bound for coarse grid to avoid edge effects when the voxel size is large
+  pos_embedding_method: fourier # only 'fourier' is used
+  encode_rel_pos_in_col: True # encode relative position before color feature interpolation
+  encode_rel_pos_in_geo: False
+  encode_exposure: False
+  encode_viewd: True
+pretrained_decoders:
+  coarse: pretrained/coarse.pt
+  middle_fine: pretrained/middle_fine.pt # one ckpt contain both middle and fine
+  color: pretrained/color.pt
+tracking:
+  ignore_edge_W: 20 # ignores to sample rays falling closer than the number to the edge of the image
+  ignore_edge_H: 20
+  use_color_in_tracking: True
+  check_color_consistancy: False
+  device: "cuda:0"
+  handle_dynamic: True # filter away pixel rays that have too high uncertainty. This leverages the observed "gt depth".
+  depth_limit: False
+  vis_freq: 50 # frame frequency of visualizing the tracking performance
+  vis_inside: False
+  vis_inside_freq: 50 # iteration frequency of visualizing the tracking performance
+  w_color_loss: 0.5 # weight of color loss term
+  separate_LR: True # use separate learning rate for translation and rotation (quaternion). Uses 1/5 of the tracking.lr for the rotation
+  const_speed_assumption: True # if True, adds the previous relative pose change between the last two frames. If False, just copies the last known pose as initial solution.
+  no_vis_on_first_frame: True
+  sample_with_color_grad: False
+  sample_depth_and_color: False
+  depth_grad_thre: 0.50
+  gt_camera: False
+  lr: 0.002
+  pixels: 200 # number of sampled rays per frame
+  iters: 20 # how many iterations of optimizer per tracking stage
+local_loop_closure:
+  do: False
+  temp_thresh: 200 # window of frames that are considered to be in active region
+  weight_update: "trilinear" # trilinear interpolation weights or integer updates
+  weight_thresh: 1e20 # threshold weight to prevent overflow of float32
+  every_frame: 1 # do local loop closure only every X frames
+mapping:
+  geo_iter_ratio: 0.4
+  col_iter_ratio: 0.6
+  device: "cuda:0"
+  BA_refine: False # perform global BA at the end of the trajectory capture as a post processing step
+  color_refine: False # refine color decoder at the end of trajectory capture as post processing step
+  geo_iter_ratio: 0.4
+  geo_iter_first: 400
+  every_frame: 5 # map only every X frames
+  BA: False # Do Bundle Adjustment or not
+  BA_cam_lr: 0.0002
+  frustum_edge: -4 # if enlarge image plane a little in frustum feature selection
+  fix_geo_decoder_mid: True # whether to fix the weights of the decoder for the mid geometry of point cloud
+  fix_geo_decoder_fine: True # whether to fix the weights of the decoder for the fine geometry point cloud
+  fix_color_decoder: False # Used when doing color refinement so that only the features are updated
+  no_vis_on_first_frame: True
+  no_mesh_on_first_frame: True
+  no_log_on_first_frame: True
+  filter_before_add_points: True
+  more_iters_when_adding: True # if True, compare added pts number to 300, clip iters to [0.95*, 2*]
+  use_kf_selection: False
+  kf_trans_thre: 0.15
+  kf_rot_thre: 15
+  vis_freq: 50 # frame frequency of visualizing the mapping performance
+  vis_inside: False
+  vis_inside_freq: 1000 # not used
+  mesh_freq: 1000 # meshing frame frequency
+  ckpt_freq: 2000 # checkpoint saving frame frequency
+  save_ckpts: False
+  keyframe_every: 50 # add frame to keyframe list every X frames
+  mapping_window_size: 5 # X - 2 keyframes used for BA and mapping. 2X used for color refinement step (if used)
+  w_color_loss: 0.1 # weight of color loss term
+  frustum_feature_selection: True # required for npc
+  keyframe_selection_method: "overlap" # overlap or global. Overlap is described in the paper. Global is just random keyframe selection
+  save_selected_keyframes_info: True # saves the keyframes selected at the current mapping frame
+  lr_first_factor: 1 # learning rate for first frame mapping
+  lr_factor: 1 # learning rate for all frames but the first frame
+  pixels: 1000 # number of sampled rays per frame
+  pixels_adding: 6000 # number of pixels choosing for adding points
+  pixels_based_on_color_grad: 0
+  pixels_based_on_normal_grad: 0
+  iters_first: 1500 # how many iterations of optimizer for first frame
+  iters: 600 # how many iterations of optimizer per mapping stage
+  local_correction: False
+  correction_every: 10
+  end_correction: False
+  save_rendered_image: True
+  min_iter_ratio: 0.95
+  init:
+    geometry_mid:
+      decoders_lr: 0.001
+      geometry_mid_lr: 0.03
+      geometry_fine_lr: 0.03
+      color_lr: 0.0
+    geometry_fine:
+      decoders_lr: 0.001
+      geometry_mid_lr: 0.03
+      geometry_fine_lr: 0.03
+      color_lr: 0.0
+    color_mid:
+      decoders_lr: 0.005
+      geometry_mid_lr: 0.005
+      geometry_fine_lr: 0.005
+      color_lr: 0.005
+    color_fine:
+      decoders_lr: 0.005
+      geometry_mid_lr: 0.005
+      geometry_fine_lr: 0.005
+      color_lr: 0.005
+  stage:
+    geometry_mid:
+      decoders_lr: 0.001
+      geometry_mid_lr: 0.03
+      geometry_fine_lr: 0.03
+      color_lr: 0.0
+    geometry_fine:
+      decoders_lr: 0.001
+      geometry_mid_lr: 0.03
+      geometry_fine_lr: 0.03
+      color_lr: 0.0
+    color_mid:
+      decoders_lr: 0.005
+      geometry_mid_lr: 0.005
+      geometry_fine_lr: 0.005
+      color_lr: 0.005
+    color_fine:
+      decoders_lr: 0.005
+      geometry_mid_lr: 0.005
+      geometry_fine_lr: 0.005
+      color_lr: 0.005
+cam:
+  H: 680
+  W: 1200
+  fx: 600.0
+  fy: 600.0
+  cx: 599.5
+  cy: 339.5
+  png_depth_scale: 6553.5
+  crop_edge: 0
+pts_along_ray: False
+rendering:
+  N_samples: 0
+  N_surface: 5
+  N_importance: 0
+  lindisp: False
+  perturb: 0.0
+  near_end: 0.3
+  near_end_surface: 0.98
+  far_end_surface: 1.02
+  sigmoid_coef_tracker: 0.1
+  sigmoid_coef_mapper: 0.1
+  sample_near_pcl: True
+  skip_zero_depth_pixel: False
+  eval_img: False
+data:
+  dim: 3
+meshing:
+  level_set: 0
+  resolution: 512
+  eval_rec: True
+  clean_mesh: True
+  depth_test: False
+  mesh_coarse_level: False
+  clean_mesh_bound_scale: 1.02
+  get_largest_components: False
+  color_mesh_extraction_method: direct_point_query
+  remove_small_geometry_threshold: 0.2
+  axis_aligned_bounding_box: True
+  use_mask: True
+  use_sigmoid: False
+pointcloud:
+  nn_search_method: "faiss" # 'faiss' only
+  nn_num: 8 # how many nn to choose within range
+  min_nn_num: 2 # if nn_num less than this, will skip this sample location
+  N_add: 3 # how many point to add at one location (front and behind gt_depth)
+  nn_weighting: "distance" # 'distance'|'expo" whether to use e(-x) or inverse square distance for weighting
+  radius_add: 0.04 # radius_add & radius_min are used when dynamic radius is not enabled
+  radius_min: 0.02
+  radius_query: 0.08
+  radius_mesh: 0.08 # not used
+  radius_add_max_fine_level: 0.08 # r_max, r_min of add and query are used by dynamic radius based on color grad range [0, color_grad_threshold]
+  radius_add_min_fine_level: 0.02
+  radius_add_max_mid_level: 0.64 #middle level max radius
+  radius_add_min_mid_level: 0.16 #middle level min radius
+  radius_hierarchy:
+    fine:
+      radius_add_max_fine: 0.08
+      radius_add_min_fine: 0.02
+    mid:
+      radius_add_max_mid: 0.64
+      radius_add_min_mid: 0.16
+  radius_query_ratio: 2
+  color_grad_threshold: 0.15
+  near_end_surface: 0.98 # add auxiliary points in this range
+  far_end_surface: 1.02
+  add_along_normals: False # if True, add augmented points along estimated normal directions
+  fix_interval_when_add_along_ray: False
+  nlist: 400 # FAISS IVF params
+  nprobe: 4
+  
+  
