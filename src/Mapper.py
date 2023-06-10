@@ -75,6 +75,9 @@ class Mapper(object):
         self.use_view_direction = cfg['use_view_direction']
         self.use_dynamic_radius = cfg['use_dynamic_radius']
 
+        self.dynamic_r_add = {}
+        self.dynamic_r_query = {}
+        
         self.use_bound = cfg['use_bound']
         self.encode_exposure = cfg['model']['encode_exposure']
 
