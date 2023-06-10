@@ -158,6 +158,7 @@ class NeuralPointCloud(object):
     
 
     def update_geo_feats(self, feats, indices=None,level=None):
+        #update geometric feature of required level
         assert torch.is_tensor(feats), 'use tensor to update features'
         if indices is not None:
             self.geo_feats[level][indices] = feats.clone().detach()
@@ -169,6 +170,7 @@ class NeuralPointCloud(object):
 
 
     def update_col_feats(self, feats, indices=None, level=None):
+        #update color feature of required level
         assert torch.is_tensor(feats), 'use tensor to update features'
         if indices is not None:
             self.col_feats[level][indices] = feats.clone().detach()
