@@ -328,8 +328,7 @@ class Mapper(object):
             est_normal (tensor): estimated normal map for current frame.
             keyframe_dict (list): list of keyframes info dictionary.
             keyframe_list (list): list of keyframe index.
-            cur_c2w (tensor): the estimated camera to world matrix of current frame. 
-            prev_c2w (tensor): est_c2w of last mapping frame.
+            cur_c2w (tensor): the estimated camera to world matrix of current frame.
 
         Returns:
             cur_c2w/None (tensor/None): return the updated cur_c2w, return None if no BA
@@ -377,6 +376,7 @@ class Mapper(object):
 
         pixs_per_image = self.mapping_pixels//len(optimize_frame)
 
+        # parameters to be optimized
         decoders_para_list = []
         color_pcl_para = []
         geo_pcl_para_fine = []
@@ -407,6 +407,7 @@ class Mapper(object):
                     # adding points to all levels of point clouds
                     mask_add = self.filter_point_before_add(
                         batch_rays_o, batch_rays_d, batch_gt_depth, self.prev_c2w)
+                    # adding points to different levels separately
                     _fine = self.npc.add_neural_points(batch_rays_o[mask_add], batch_rays_d[mask_add],
                                                    batch_gt_depth[mask_add], batch_gt_color[mask_add],
                                                    normals=batch_est_normal[mask_add] if has_est_normal else None,
@@ -439,7 +440,7 @@ class Mapper(object):
                     print(f'{_mid} locations to add points in overlapping area of mid level.')
                     frame_pts_add += _fine
                 else:
-                    
+                    # adding points to different levels separately
                     _fine = self.npc.add_neural_points(batch_rays_o, batch_rays_d, batch_gt_depth, batch_gt_color, normals=batch_est_normal if has_est_normal else None,
                                 dynamic_radius=self.dynamic_r_add['fine'][j, i] if self.use_dynamic_radius else None, level='fine',idx=idx)
                     _mid = self.npc.add_neural_points(batch_rays_o, batch_rays_d, batch_gt_depth, batch_gt_color, normals=batch_est_normal if has_est_normal else None,
@@ -448,6 +449,7 @@ class Mapper(object):
                     print(f'{_mid} locations to add points in mid level.')
                     frame_pts_add += _fine
             else:
+                # adding points to different levels separately
                 _fine = self.npc.add_neural_points(batch_rays_o, batch_rays_d, batch_gt_depth, batch_gt_color, normals=batch_est_normal if has_est_normal else None,
                                                dynamic_radius=self.dynamic_r_add['fine'][j, i] if self.use_dynamic_radius else None, level='fine',idx=idx)
                 _mid = self.npc.add_neural_points(batch_rays_o, batch_rays_d, batch_gt_depth, batch_gt_color, normals=batch_est_normal if has_est_normal else None,
@@ -465,6 +467,7 @@ class Mapper(object):
                     depth_filter=True, return_index=True)
                 batch_est_normal = est_normal[j,
                                               i, :] if has_est_normal else None
+                # adding points to different levels separately
                 _fine = self.npc.add_neural_points(batch_rays_o, batch_rays_d, batch_gt_depth, batch_gt_color,
                                                normals=batch_est_normal if has_est_normal else None, is_pts_grad=True
                                                , dynamic_radius=self.dynamic_r_add['fine'][j, i] if self.use_dynamic_radius else None, level='fine',idx=idx)
@@ -481,10 +484,9 @@ class Mapper(object):
         npc_geo_feats_mid = self.npc.get_geo_feats('mid')
         npc_col_feats_mid = self.npc.get_col_feats('mid')
         
-      
+        # store cloud normals for rendering
         self.cloud_normals_fine = torch.tensor(
                 self.npc.cloud_normal(level='fine'), device=self.device)
-
         self.cloud_normals_mid = torch.tensor(
                 self.npc.cloud_normal(level='mid'), device=self.device)
         
@@ -497,7 +499,7 @@ class Mapper(object):
                 masked_c_grad = {}
                 mask_c2w = cur_c2w
 
-                # two indices for geo&color feature? geo->mid level, color->fine level
+                # indices of features within the frustum
                 indices_geo_fine = self.get_mask_from_c2w(mask_c2w, gt_depth_np,level='fine')
                 indices_col_fine = self.get_mask_from_c2w(mask_c2w, gt_depth_np,level='fine')
                 indices_geo_mid = self.get_mask_from_c2w(mask_c2w, gt_depth_np,level='mid')
