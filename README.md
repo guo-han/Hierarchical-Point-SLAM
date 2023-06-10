@@ -147,7 +147,7 @@ scene0181
 All configs can be found under the `./configs` folder.
 ### ScanNet Dataset Configurations:
 
-- Open the `./configs/ScanNet/scenexxxx.yaml` and `./configs/ScanNet/others/scenexxxx.yaml` files.
+- Open the `./configs/ScanNet/scenexxxx.yaml` files.
 - Check and modify the `data/input_folder` path in configuration files according to your dataset location.
 ### wandb (Weights and Biases) Integration:
 
