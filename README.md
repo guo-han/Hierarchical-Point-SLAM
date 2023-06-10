@@ -141,6 +141,7 @@ To run on the ScanNet, for example, scene0025, use the following command,
 python run.py configs/ScanNet/scene0025.yaml
 ```
 ### Run on Euler Cluster
+Please remember to make changes to the Paths inside repro_demo.sh, as well as the wandb_dir in configs/ScanNet/point_slam.yaml
 ```
 cd $SCRATCH/point-slam-local
 sbatch repro_euler.sh   # run the job, remember to check args before each run
