@@ -44,7 +44,7 @@ The pipeline of hierarchical Point-SLAM
 <p align="center">
 A comparison of the resulting neural point cloud
 taken from ScanNet scene 0181 at the frame 2438. <br>
-Left: master. Right: Ours.
+Left: Point-SLAM. Right: Ours.
 </p>
 
 <details open="open" style='padding: 10px; border-radius:5px 30px 30px 5px; border-style: solid; border-width: 1px;'>
