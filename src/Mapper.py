@@ -1043,16 +1043,9 @@ class Mapper(object):
                     dynamic_r_add = fn_map_r_add(color_grad_mag)
                     dynamic_r_query = fn_map_r_query(color_grad_mag)
                  
-               
                     self.dynamic_r_add[level], self.dynamic_r_query[level] = torch.from_numpy(dynamic_r_add).to(
                         self.device), torch.from_numpy(dynamic_r_query).to(self.device)
-                    # if init:
-                    #     torch.save(self.dynamic_r_query[level], f'{self.output}/dynamic_r_frame/r_query_{idx:05d}_{level}.pt')
-                        
-
-
-                    
-                    
+                   
 
             color_refine = True if (
                 idx == self.n_img-1 and self.color_refine) else False
@@ -1166,6 +1159,7 @@ class Mapper(object):
                 self.keyframe_list.append(idx)
                 dic_of_cur_frame = {'gt_c2w': gt_c2w.detach().cpu(), 'idx': idx, 'color': gt_color.detach().cpu(),
                                     'depth': gt_depth.detach().cpu(), 'est_c2w': cur_c2w.clone().detach()}
+                # update query radii of different levels
                 if self.use_dynamic_radius:
                     dic_of_cur_frame.update(
                         {'dynamic_r_query_mid': self.dynamic_r_query['mid'].detach()})
