@@ -37,7 +37,7 @@ The pipeline of hierarchical Point-SLAM
 
 
 <div align = "center">
-<img align="center"  src="./imgs/master.png" width="180">  <img align="center"  src="./imgs/ours.png"  width="170">
+<img align="center"  src="./imgs/master.png" width="200">  <img align="center"  src="./imgs/ours.png"  width="200">
 </div>
 
 <p align="center">
