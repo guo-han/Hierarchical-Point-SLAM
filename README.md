@@ -123,16 +123,9 @@ Please follow the data downloading procedure on the [ScanNet](http://www.scan-ne
 </details>
 
 
-We use the following sequences: 
+We use the scene 0025 in ScanNet as demo: 
 ```
 scene0025_02
-scene0059_00
-scene0062_00
-scene0103_00
-scene0106_00
-scene0126_00
-scene0181_00
-scene0207_00
 ```
 For configs, please remember to check and modify the `input_folder` path.
 ## Run
