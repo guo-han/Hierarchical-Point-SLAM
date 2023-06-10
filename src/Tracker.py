@@ -332,7 +332,7 @@ class Tracker(object):
                     self.dynamic_r_add[level], self.dynamic_r_query[level] = torch.from_numpy(dynamic_r_add).to(
                         self.device), torch.from_numpy(dynamic_r_query).to(self.device)
      
-                    # torch.save(self.dynamic_r_query[level], f'{self.output}/dynamic_r_frame/r_query_{idx:05d}_{level}.pt')
+                    torch.save(self.dynamic_r_query[level], f'{self.output}/dynamic_r_frame/r_query_{idx:05d}_{level}.pt')
 
             if self.sample_with_color_grad or self.sample_depth_and_color:
                 H, W, fx, fy, cx, cy = self.H, self.W, self.fx, self.fy, self.cx, self.cy
