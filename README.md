@@ -51,6 +51,9 @@ Left: master. Right: Ours.
   <summary>Table of Contents</summary>
   <ol>
     <li>
+      <a href="#folder-structure">Folder Structure</a>
+    </li>
+    <li>
       <a href="#environment-setup">Environment Setup</a>
     </li>
     <li>
@@ -68,6 +71,68 @@ Left: master. Right: Ours.
   </ol>
 </details>
 
+## Folder Structure
+Here we provide an overview of the repository's structure. Brief comments are added for explanation.
+<details>
+  <summary>[Directory structure of this Repository (click to expand)]</summary>
+
+```
+Hierarchical-Point-SLAM
+│  env.yaml                   # environment settings
+│  README.md
+│  repro_demo.sh              # a demo shell file can be run on Euler cluster
+│  run.py
+│
+├─configs                     # include all config files
+│  │  point_slam.yaml         # point-slam general config
+│  │
+│  └─ScanNet
+│          scannet.yaml       # point-slam config for scannet
+│          scenexxxx.yaml     # scannet scene specific configs
+│
+├─documents
+│      poster.pdf
+│      report.pdf
+│
+├─imgs                        # images shown in readme
+│      xxx.png
+│
+├─pretrained                  # pretrained model for conv_onet
+│      coarse.pt
+│      color.pt
+│      middle_fine.pt
+│
+└─src                         # include all core source files
+    │  common.py
+    │  config.py
+    │  Mapper.py              # mapping process
+    │  neural_point.py        # neural point cloud data class
+    │  Point_SLAM.py
+    │  Tracker.py             # tracker process
+    │  __init__.py
+    │
+    ├─conv_onet
+    │  │  config.py
+    │  │  __init__.py
+    │  │
+    │  └─models
+    │          decoder.py     # MLP decoder for color and geometry information decoding
+    │          __init__.py
+    │
+    ├─tools
+    │      cull_mesh.py
+    │      eval_ate.py
+    │      eval_recon.py
+    │      get_mesh_tsdf_fusion.py
+    │
+    └─utils
+            datasets.py
+            Logger.py
+            Renderer.py
+            Visualizer.py
+```
+</details>
+
 ## Environment Setup
 One can create an anaconda environment called `point-slam`.
 ```
@@ -81,6 +146,7 @@ cd evaluate_3d_reconstruction_lib
 pip install .
 ```
 ### Set Environment on ETH Euler Cluster
+Comment line 120 `open3d==0.16.0` in `env.yaml` before proceeding.
 ```
 module load StdEnv mesa/18.3.6 cudnn/8.2.1.32 python_gpu/3.10.4 eth_proxy hdf5/1.10.1 gcc/8.2.0 openblas/0.3.15 nccl/2.11.4-1 cuda/11.3.1 pigz/2.4 cmake/3.25.0
 cd $SCRATCH
@@ -144,9 +210,9 @@ Please follow the data downloading procedure on the [ScanNet](http://www.scan-ne
 </details>
 
 
-We use the scene 0181 in ScanNet as demo: 
+We use the scene 0181 in ScanNet as demo, here is the [link](https://drive.google.com/file/d/1ZEU0D8oASQu9vIAorWbFSfEB-3nuGztX/view?usp=sharing) for the demo scene: 
 ```
-scene0181
+scene0181_00
 ```
 ## Configs
 All configs can be found under the `./configs` folder.
