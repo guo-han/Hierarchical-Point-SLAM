@@ -102,7 +102,7 @@ cd evaluate_3d_reconstruction_lib
 pip install .
 ```
 More information about installing [Open3D](https://gist.github.com/kev-in-ta/372c8451b172d309b7998362597a1456) and [evaluate_3d_reconstruction_lib](https://github.com/tfy14esa/evaluate_3d_reconstruction_lib).
-## Dataset and Configs
+## Dataset 
 
 ### ScanNet
 Please follow the data downloading procedure on the [ScanNet](http://www.scan-net.org/) website, and extract color/depth frames from the `.sens` file using this [code](https://github.com/ScanNet/ScanNet/blob/master/SensReader/python/reader.py).
@@ -143,7 +143,32 @@ We use the scene 0181 in ScanNet as demo:
 ```
 scene0181
 ```
-For configs, please remember to check and modify the `input_folder` path.
+## Configs
+All configs can be found under the `./configs` folder.
+### ScanNet Dataset Configurations:
+
+- Open the `./configs/ScanNet/scenexxxx.yaml` and `./configs/ScanNet/others/scenexxxx.yaml` files.
+- Check and modify the `data/input_folder` path in configuration files according to your dataset location.
+### wandb (Weights and Biases) Integration:
+
+- In the `./configs/point_slam.yaml` file, set the `wandb_dir` variable to your own path.
+- Ensure that the specified path exists and is accessible.
+### Modifying Coarse Level Radius Values for Testing:
+
+- In the `./configs/ScanNet/scannet.yaml` file, locate the variables:
+  - `pointcloud/radius_hierarchy/mid/radius_add_max`
+  - `pointcloud/radius_hierarchy/mid/radius_add_min`
+- Adjust the values of these variables to experiment with different coarse level radius values.
+### Mapping and Tracking Iterations:
+
+- To change the number of iterations for mapping and tracking, refer to the variables:
+  - `tracking/iters`
+  - `mapping/iters`
+- Note that these variables control the total number of iterations for both levels. The default ratio of iteration division between the two levels is 0.5. If you want to modify the mapping iteration ratio for the middle level specifically, check the variable `mapping/mid_iter_ratio` in `./configs/point_slam.yaml`.
+### Variable Overwriting and Caution:
+
+- Take into account that the settings specified in `point_slam.yaml` will be overwritten by those in `scannet.yaml` if they share the same key values.
+- Exercise caution when modifying variables to ensure that you are changing the intended ones.
 ## Run
 To run on the ScanNet, for example, scene0181, use the following command,
 ```

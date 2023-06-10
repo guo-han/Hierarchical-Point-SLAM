@@ -38,7 +38,7 @@ class NeuralPointCloud(object):
         self.near_end_surface = cfg['pointcloud']['near_end_surface']
         self.far_end_surface = cfg['pointcloud']['far_end_surface']
 
-        # self._cloud = []
+        # Hierarchical point cloud are stored as dictionary
         self.radius_hierarchy = cfg['pointcloud']['radius_hierarchy']
         radius_levels = self.radius_hierarchy.keys()
         self._cloud = {}
@@ -202,6 +202,7 @@ class NeuralPointCloud(object):
             normals (tensor, optional): Defaults to None.
         """
         if idx == 0:
+            # initialize point cloud hierarchy
             self._cloud_pos.setdefault(level, [])
             self._cloud_normal.setdefault(level, [])
             self._pts_num.setdefault(level, 0)
@@ -209,6 +210,7 @@ class NeuralPointCloud(object):
                                            self.cuda_id,
                                            faiss.IndexIVFFlat(faiss.IndexFlatL2(3), 3, self.nlist, faiss.METRIC_L2)))
             self.index[level].nprobe = self.nprobe
+            # initialize geometry and color features for different hierarchy levels
             self.geo_feats.setdefault(level, None)
             self.col_feats.setdefault(level, None)
             
@@ -254,14 +256,10 @@ class NeuralPointCloud(object):
             else:  # pts only at rgbd input
                 z_vals = batch_gt_depth.unsqueeze(-1).repeat(1, 1)
             
-            # print(level)
-            # find neighboring points with current dynamic radius
-    
-            #same points 
             
             if self.index[level].is_trained:
                 
-                
+                # search neighbors within the dynamic radii. Different radius settings for different levels
                 _, _, neighbor_num_gt = self.find_neighbors_faiss(
                     pts_gt, step='add', is_pts_grad=is_pts_grad, dynamic_radius=dynamic_radius,level=level)
                 
@@ -297,12 +295,11 @@ class NeuralPointCloud(object):
                 pts = pts.reshape(-1, 3)
                 
             
-                
+            # add points to corresponding level   
             self._cloud_pos[level] += pts.tolist()
             self._pts_num[level] += pts.shape[0]
             
-            #all good above
-
+            # feature extraction
             if self.geo_feats[level] is None:
                 self.geo_feats[level] = torch.zeros(
                     [self._pts_num[level], self.c_dim], device=self.device).normal_(mean=0, std=0.1)
