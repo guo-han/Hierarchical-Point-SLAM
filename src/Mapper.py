@@ -1176,6 +1176,7 @@ class Mapper(object):
             init = False
             self.prev_c2w = self.estimate_c2w_list[idx]
 
+            # log and save point clouds every 300 frames
             if (idx % 300 == 0 or idx == self.n_img-1):
                 cloud_pos = np.array(self.npc.input_pos())
                 cloud_rgb = np.array(self.npc.input_rgb())
@@ -1199,7 +1200,6 @@ class Mapper(object):
                     pc_list.append(wandb.Object3D(npc_cloud_mid, caption="mid"))
                     wandb.log(
                         {f'Cloud/point_cloud_{idx:05d}': pc_list})
-                        # {f'Cloud/point_cloud_{idx:05d}': wandb.Object3D(point_cloud)})
 
             if (idx > 0 and idx % self.ckpt_freq == 0) or idx == self.n_img-1:
                 self.logger.log(idx, self.keyframe_dict, self.keyframe_list,
@@ -1218,7 +1218,8 @@ class Mapper(object):
 
             if self.low_gpu_mem:
                 torch.cuda.empty_cache()
-
+        
+        # evaluation in the end
         try:
             print('✨ Point-SLAM finished, evaluating...')
             ate_rmse = subprocess.check_output(['python', '-u', 'src/tools/eval_ate.py', str(cfg['config_path']), '--output', str(cfg['data']['output'])],
@@ -1242,6 +1243,8 @@ class Mapper(object):
             self.save_ckpts = True  # in case needed
             print('Failed to evaluate trajectory.')
 
+        # reconstruction is not our major concern
+        
         # re-render frames at the end for meshing
         # if cfg['dataset'] == 'replica':
         #     print('Starting re-rendering frames...')
@@ -1355,6 +1358,7 @@ class Mapper(object):
         #             traceback.print_exception(e)
         #             print('Failed to evaluate 3D reconstruction.')
 
+        # free up some space
         if os.path.exists(f'{self.output}/dynamic_r_frame'):
             shutil.rmtree(f'{self.output}/dynamic_r_frame')
         if os.path.exists(f'{self.output}/rendered_every_frame'):
