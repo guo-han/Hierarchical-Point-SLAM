@@ -10,6 +10,7 @@
     <a href="https://github.com/cs-vision"><strong>Shi Chen*</strong></a>
   </p>
   <p align="center"><strong>(* Equal Contribution)</strong></p>
+  <h3 align="center"><a href="https://github.com/guo-han/Hierarchical-Point-SLAM/tree/main/documents/poster.pdf">Poster</a> | <a href="https://github.com/guo-han/Hierarchical-Point-SLAM/tree/main/documents/report.pdf">Report</a></h3>
   <div align="center"></div>
 </p>
 <p align="center">
@@ -138,24 +139,18 @@ Please follow the data downloading procedure on the [ScanNet](http://www.scan-ne
 </details>
 
 
-We use the following sequences: 
+We use the scene 0181 in ScanNet as demo: 
 ```
-scene0025_02
-scene0059_00
-scene0062_00
-scene0103_00
-scene0106_00
-scene0126_00
-scene0181_00
-scene0207_00
+scene0181
 ```
 For configs, please remember to check and modify the `input_folder` path.
 ## Run
-To run on the ScanNet, for example, scene0059, use the following command,
+To run on the ScanNet, for example, scene0181, use the following command,
 ```
-python run.py configs/ScanNet/scene0059.yaml
+python run.py configs/ScanNet/scene0181.yaml
 ```
 ### Run on Euler Cluster
+Please remember to modify the Paths inside repro_demo.sh, as well as the `wandb_dir` in configs/ScanNet/point_slam.yaml
 ```
 cd $SCRATCH/point-slam-local
 sbatch repro_euler.sh   # run the job, remember to check args before each run
