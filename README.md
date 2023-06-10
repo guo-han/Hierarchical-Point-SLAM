@@ -242,6 +242,7 @@ All configs can be found under the `./configs` folder.
 - Exercise caution when modifying variables to ensure that you are changing the intended ones.
 ## Run
 Before running, make sure read the `Configs` section and modify all necessary configs for your running.
+
 To run on the ScanNet, for example, scene0181, use the following command,
 ```
 python run.py configs/ScanNet/scene0181.yaml
