@@ -31,7 +31,7 @@ output_affix="/cluster/scratch/liuqing/3DVoutput"
 method="point-slam"
 dataset=${datasets[2]}
 #scene_name=${replica_scenes[0]}
-scene_name="scene0025"
+scene_name="scene0181"
 
 run_args="--wandb --project_name POINT_SLAM_hierarchical --map_iter 600 --kf_every 10 --map_win_size 20"
 
