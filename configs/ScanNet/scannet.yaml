@@ -18,7 +18,7 @@ tracking:
   w_color_loss: 0.5
   lr: 0.0005      
   pixels: 5000
-  iters: 200
+  iters: 100
   sample_with_color_grad: True
   sample_depth_and_color: False
   depth_limit: False
@@ -38,6 +38,7 @@ mapping:
   geo_iter_first: 200
   iters: 600
   end_correction: True
+  mid_iter_ratio: 0.5
 rendering:
   sample_near_pcl: False
   near_end_surface: 0.96

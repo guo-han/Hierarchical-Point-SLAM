@@ -196,15 +196,15 @@ pointcloud:
   radius_mesh: 0.08 # not used
   radius_add_max_fine_level: 0.08 # r_max, r_min of add and query are used by dynamic radius based on color grad range [0, color_grad_threshold]
   radius_add_min_fine_level: 0.02
-  radius_add_max_mid_level: 0.64 #middle level max radius
-  radius_add_min_mid_level: 0.16 #middle level min radius
+  radius_add_max_mid_level: 0.48 #middle level max radius
+  radius_add_min_mid_level: 0.12 #middle level min radius
   radius_hierarchy:
     fine:
       radius_add_max_fine: 0.08
       radius_add_min_fine: 0.02
     mid:
-      radius_add_max_mid: 0.64
-      radius_add_min_mid: 0.16
+      radius_add_max_mid: 0.48
+      radius_add_min_mid: 0.12
   radius_query_ratio: 2
   color_grad_threshold: 0.15
   near_end_surface: 0.98 # add auxiliary points in this range
