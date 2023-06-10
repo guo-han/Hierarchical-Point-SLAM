@@ -19,8 +19,6 @@ conda activate point-slam
 
 datasets=("ScanNet")
 
-scannet_scenes=("scene0025")
-
 output_affix="/cluster/scratch/liuqing/3DVoutput"
 # run.py arguments: [scene config] --gt_camera --wandb --dynamic_r --fixed_r --radius_add_max --radius_add --radius_query
 #                   --use_viewdir --no_viewdir --encode_viewdir --no_encode_viewdir --use_color_track --track_w_color_loss 
