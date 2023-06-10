@@ -75,15 +75,6 @@ class Mapper(object):
         self.use_view_direction = cfg['use_view_direction']
         self.use_dynamic_radius = cfg['use_dynamic_radius']
 
-        # self.dynamic_r_add = dict.fromkeys(cfg['pointcloud']['radius_hierarchy'].keys(), None)
-        # self.dynamic_r_query = dict.fromkeys(cfg['pointcloud']['radius_hierarchy'].keys(), None)
-        self.dynamic_r_add = {}
-        self.dynamic_r_query = {}
-        self.dynamic_r_add_fine = None
-        self.dynamic_r_query_fine = None
-        self.dynamic_r_add_mid = None
-        self.dynamic_r_query_mid = None
-
         self.use_bound = cfg['use_bound']
         self.encode_exposure = cfg['model']['encode_exposure']
 
