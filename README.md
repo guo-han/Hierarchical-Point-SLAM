@@ -32,7 +32,7 @@ The pipeline of hierarchical Point-SLAM
 
 <p align="center">
   <a href="">
-    <img src="./imgs/result_table.png" alt="Logo" width="90%">
+    <img src="./imgs/result_table.png" alt="Logo" width="80%">
   </a>
 </p>
 
