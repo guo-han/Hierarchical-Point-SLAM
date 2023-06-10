@@ -27,7 +27,22 @@ The pipeline of hierarchical Point-SLAM
         <li>In tracking: begin by optimizing camera pose using coarse-level features, and subsequently integrate fine-level features for more refined enhancements.</li>
     </ul>
 </p>
-<br>
+
+<p align="center">
+  <a href="">
+    <img src="./imgs/result_table.png" alt="Logo" width="90%">
+  </a>
+</p>
+
+
+<div align = "center">
+<img align="center"  src="./imgs/master.png" width="180">  <img align="center"  src="./imgs/ours.png"  width="170">
+</div>
+
+<p align="center">
+A comparison of the resulting neural point cloud
+taken from ScanNet scene 0181 at the frame 2438. Left: master. Right: Ours.
+</p>
 
 <details open="open" style='padding: 10px; border-radius:5px 30px 30px 5px; border-style: solid; border-width: 1px;'>
   <summary>Table of Contents</summary>
