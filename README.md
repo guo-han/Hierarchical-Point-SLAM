@@ -26,6 +26,7 @@ The pipeline of hierarchical Point-SLAM
         <li>A coarse-to-fine hierarchical neural point cloud with different dynamic sampling radius.</li>
         <li>In mapping: optimize the neural features in coarse and fine point clouds independently.</li>
         <li>In tracking: begin by optimizing camera pose using coarse-level features, and subsequently integrate fine-level features for more refined enhancements.</li>
+        <li>Our results are shown below.</li>
     </ul>
 </p>
 
@@ -42,7 +43,8 @@ The pipeline of hierarchical Point-SLAM
 
 <p align="center">
 A comparison of the resulting neural point cloud
-taken from ScanNet scene 0181 at the frame 2438. Left: master. Right: Ours.
+taken from ScanNet scene 0181 at the frame 2438. <br>
+Left: master. Right: Ours.
 </p>
 
 <details open="open" style='padding: 10px; border-radius:5px 30px 30px 5px; border-style: solid; border-width: 1px;'>
@@ -52,7 +54,10 @@ taken from ScanNet scene 0181 at the frame 2438. Left: master. Right: Ours.
       <a href="#environment-setup">Environment Setup</a>
     </li>
     <li>
-      <a href="#dataset-and-configs">Dataset and Configs</a>
+      <a href="#dataset">Dataset</a>
+    </li>
+    <li>
+      <a href="#configs">Configs</a>
     </li>
     <li>
       <a href="#run">Run</a>
@@ -64,10 +69,10 @@ taken from ScanNet scene 0181 at the frame 2438. Left: master. Right: Ours.
 </details>
 
 ## Environment Setup
-One can create an anaconda environment called `point-slam-env`.
+One can create an anaconda environment called `point-slam`.
 ```
 conda env create -f env.yaml
-conda activate point-slam-env
+conda activate point-slam
 ```
 To evaluate F-score, please install [this](https://github.com/tfy14esa/evaluate_3d_reconstruction_lib) library.
 ```
@@ -79,8 +84,8 @@ pip install .
 ```
 module load StdEnv mesa/18.3.6 cudnn/8.2.1.32 python_gpu/3.10.4 eth_proxy hdf5/1.10.1 gcc/8.2.0 openblas/0.3.15 nccl/2.11.4-1 cuda/11.3.1 pigz/2.4 cmake/3.25.0
 cd $SCRATCH
-git clone git@github.com:guo-han/point-slam-local.git
-cd $SCRATCH/point-slam-local
+git clone git@github.com:guo-han/Hierarchical-Point-SLAM.git
+cd $SCRATCH/Hierarchical-Point-SLAM
 conda env create -f env.yaml python=3.10.4
 conda activate point-slam
 cd $SCRATCH
@@ -175,9 +180,9 @@ To run on the ScanNet, for example, scene0181, use the following command,
 python run.py configs/ScanNet/scene0181.yaml
 ```
 ### Run on Euler Cluster
-Please remember to modify the Paths inside repro_demo.sh, as well as the `wandb_dir` in configs/ScanNet/point_slam.yaml
+Please remember to modify the `--output`, `--error`, `source [conda env path]`, `output_affix`, etc. inside `repro_demo.sh`, as well as the `wandb_dir` in `configs/ScanNet/point_slam.yaml`
 ```
-cd $SCRATCH/point-slam-local
+cd $SCRATCH/Hierarchical-Point-SLAM
 sbatch repro_euler.sh   # run the job, remember to check args before each run
 ```
 ## Acknowledgement
