@@ -10,6 +10,7 @@
     <a href="https://github.com/cs-vision"><strong>Shi Chen*</strong></a>
   </p>
   <p align="center"><strong>(* Equal Contribution)</strong></p>
+  <h3 align="center"><a href="https://github.com/guo-han/Hierarchical-Point-SLAM/tree/main/documents/poster.pdf">Poster</a> | <a href="https://github.com/guo-han/Hierarchical-Point-SLAM/tree/main/documents/report.pdf">Report</a></h3>
   <div align="center"></div>
 </p>
 <p align="center">
