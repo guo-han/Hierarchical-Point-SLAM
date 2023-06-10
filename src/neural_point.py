@@ -299,7 +299,7 @@ class NeuralPointCloud(object):
             self._cloud_pos[level] += pts.tolist()
             self._pts_num[level] += pts.shape[0]
             
-            # feature extraction
+            # feature concatenation and initialization for current frame
             if self.geo_feats[level] is None:
                 self.geo_feats[level] = torch.zeros(
                     [self._pts_num[level], self.c_dim], device=self.device).normal_(mean=0, std=0.1)
