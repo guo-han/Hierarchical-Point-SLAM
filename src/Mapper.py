@@ -505,12 +505,11 @@ class Mapper(object):
                 indices_geo_mid = self.get_mask_from_c2w(mask_c2w, gt_depth_np,level='mid')
                 indices_col_mid = self.get_mask_from_c2w(mask_c2w, gt_depth_np,level='mid')
                 
+                # get features within the frustum
                 geo_pcl_grad_fine = npc_geo_feats_fine[indices_geo_fine].clone(
                 ).detach().requires_grad_(True)
-
                 geo_pcl_grad_mid = npc_geo_feats_mid[indices_geo_mid].clone(
                 ).detach().requires_grad_(True)
-
 
                 masked_c_grad['indices_geo_fine'] = indices_geo_fine
                 masked_c_grad['indices_geo_mid'] = indices_geo_mid
@@ -553,6 +552,7 @@ class Mapper(object):
                 masked_c_grad['geo_pcl_grad_mid'] = geo_pcl_grad_mid
                 masked_c_grad['color_pcl_grad_mid'] = color_pcl_grad_mid
 
+        # determine if the decoders are learnable
         if not self.fix_geo_decoder_mid:
             decoders_para_list += list(
                 self.decoders.geo_decoder_mid.parameters())
@@ -603,7 +603,8 @@ class Mapper(object):
             if idx > 0 and not color_refine:
                 num_joint_iters = np.clip(int(num_joint_iters*frame_pts_add/300), int(
                     self.min_iter_ratio*num_joint_iters), 2*num_joint_iters)
-        #num_joint_iters = 300 if not self.more_iters_when_adding
+        
+        # determine numbers of iterations for different levels
         num_mid_iters =  int(num_joint_iters * self.mid_iter_ratio)
         num_fine_iters =  int(num_joint_iters * (1 - self.mid_iter_ratio))
         for joint_iter in range(num_joint_iters): #300 for mid, 300 for fine
@@ -625,14 +626,6 @@ class Mapper(object):
                 npc_geo_feats_mid = geo_feats_mid
                 npc_col_feats_mid = col_feats_mid
             
-            '''
-            if joint_iter <= (self.geo_iter_first if init else int(num_joint_iters*self.middle_iter_ratio)):
-                self.stage = 'geometry_mid'
-            elif joint_iter <= int(num_joint_iters*self.fine_iter_ratio):
-                self.stage = 'geometry_fine'
-            else:
-                self.stage = 'color_fine'
-            '''
             #self.geo_iter_ratio: 0.4, self.col_iter_ratio: 0.6
             if joint_iter <= (self.geo_iter_first if init else int(num_mid_iters*self.geo_iter_ratio)):
                 self.stage = 'geometry_mid'
@@ -669,7 +662,7 @@ class Mapper(object):
                 else:
                     optimizer.param_groups[5]['lr'] = 0.0
 
-
+            # only for visualization
             if self.stage == 'geometry_mid'or self.stage == 'color_mid':
                 self.cloud_pos_tensor = torch.tensor(
                         self.npc.cloud_pos(level='mid'), device=self.device)
@@ -727,14 +720,11 @@ class Mapper(object):
                 batch_gt_depth_list.append(batch_gt_depth.float())
                 batch_gt_color_list.append(batch_gt_color.float())
 
-                # which level?
-
                 if self.encode_exposure:
                     self.exposure_feat = self.exposure_feat_shared[0].clone().requires_grad_()
-                # print('stage:',self.stage)
-                #batch_r_query_list
-                if self.use_dynamic_radius:                
 
+                # dynamic sampling radii based on color gradient
+                if self.use_dynamic_radius:
                     if frame == -1:
                         batch_r_query_list_mid.append(self.dynamic_r_query['mid'][j, i])
                         batch_r_query_list_fine.append(self.dynamic_r_query['fine'][j, i])
@@ -775,42 +765,39 @@ class Mapper(object):
                         10*batch_gt_depth.median(), 1.2*torch.max(batch_gt_depth))
             batch_rays_d, batch_rays_o = batch_rays_d[inside_mask], batch_rays_o[inside_mask]
             batch_gt_depth, batch_gt_color = batch_gt_depth[inside_mask], batch_gt_color[inside_mask]
+            
             if self.use_dynamic_radius:
-
                 r_query_list_mid = r_query_list_mid[inside_mask]
                 r_query_list_fine = r_query_list_fine[inside_mask]
- 
+
+            # prepare feature dictionaries for rendering
             geo_feats_dict = {"mid": npc_geo_feats_mid, "fine": npc_geo_feats_fine}
             col_feats_dict = {"mid": npc_col_feats_mid, "fine": npc_col_feats_fine}
             cloud_pos_dict = {"mid": torch.tensor(self.npc.cloud_pos(level='mid'), device=self.device), "fine": torch.tensor(self.npc.cloud_pos(level='fine'), device=self.device)}
-            # normals_dict = {"mid": self.cloud_normals_mid, "fine": self.cloud_normals_fine}
             r_query_dict = {"mid": r_query_list_mid, "fine": r_query_list_fine}
-            #rendering: use fine level of color feature h
-            # ret = self.renderer.render_batch_ray(npc, self.decoders, batch_rays_d, batch_rays_o, device, self.stage,
-            #                                      gt_depth=batch_gt_depth, npc_geo_feats=geo_feats_render, #
-            #                                     x npc_col_feats=col_feats_render, #
-            #                                      is_tracker=True if self.BA else False,
-            #                                      cloud_pos=self.cloud_pos_tensor, #
-            #                                      normals=cloud_normals_render, #
-            #                                      dynamic_r_query=r_query_list, #
-            #                                      exposure_feat=None)
+
+            # do rendering
             ret = self.renderer.render_batch_ray(npc, self.decoders, batch_rays_d, batch_rays_o, device, self.stage,
-                                                 gt_depth=batch_gt_depth, npc_geo_feats=geo_feats_dict, #
-                                                 npc_col_feats=col_feats_dict, #
+                                                 gt_depth=batch_gt_depth, npc_geo_feats=geo_feats_dict,
+                                                 npc_col_feats=col_feats_dict,
                                                  is_tracker=True if self.BA else False,
-                                                 cloud_pos=cloud_pos_dict, #
-                                                 normals=self.cloud_normals, #
-                                                 dynamic_r_query=r_query_dict.copy(), #
+                                                 cloud_pos=cloud_pos_dict,
+                                                 normals=self.cloud_normals,
+                                                 dynamic_r_query=r_query_dict.copy(),
                                                  exposure_feat=None)
             depth, uncertainty, color, valid_ray_mask = ret
             
             depth_mask = (batch_gt_depth > 0) & valid_ray_mask
             depth_mask = depth_mask & (~torch.isnan(depth))
+            
             # calculating geometry loss
             geo_loss = torch.abs(
                 batch_gt_depth[depth_mask]-depth[depth_mask]).sum()
             loss = geo_loss.clone()
+            
+            # calculating color loss according to the current stage
             if self.stage == 'color_mid':
+                # exposure correction
                 if self.encode_exposure:
                     indices_tensor = torch.cat(indices_tensor, dim=0)[
                         inside_mask]
@@ -822,6 +809,7 @@ class Mapper(object):
                         start_end.append((start_idx.item(), end_idx.item()))
                     for i, exposure_feat in enumerate(exposure_feat_list):
                         start, end = start_end[i]
+                        # using the mid level exposure MLP
                         affine_tensor = self.decoders.color_decoder_mid.mlp_exposure(
                             exposure_feat)
                         rot, trans = affine_tensor[:9].reshape(
@@ -837,6 +825,7 @@ class Mapper(object):
                 loss += weighted_color_loss
             
             elif self.stage == 'color_fine':
+                # exposure correction
                 if self.encode_exposure:
                     indices_tensor = torch.cat(indices_tensor, dim=0)[
                         inside_mask]
@@ -848,6 +837,7 @@ class Mapper(object):
                         start_end.append((start_idx.item(), end_idx.item()))
                     for i, exposure_feat in enumerate(exposure_feat_list):
                         start, end = start_end[i]
+                        # using the fine level exposure MLP
                         affine_tensor = self.decoders.color_decoder_fine.mlp_exposure(
                             exposure_feat)
                         rot, trans = affine_tensor[:9].reshape(
@@ -902,6 +892,7 @@ class Mapper(object):
             if joint_iter == num_joint_iters-1:
                 print('idx: ', idx.item(), ', time', f'{toc - tic:0.6f}', ', geo_loss_pixel: ', f'{(geo_loss.item()/depth_mask.sum().item()):0.6f}',
                       ', color_loss_pixel: ', f'{(color_loss.item()/depth_mask.sum().item()):0.4f}')
+                # logging on wandb
                 if self.wandb:
                     if not self.gt_camera:
                         wandb.log({'idx_map': int(idx.item()), 'time': float(f'{toc - tic:0.6f}'),
@@ -922,17 +913,16 @@ class Mapper(object):
         if (not self.vis_inside) or idx == 0:
             self.visualizer.vis(idx, self.num_joint_iters-1, cur_gt_depth, cur_gt_color, cur_c2w, self.npc, self.decoders,
                                 geo_feats_dict, col_feats_dict, freq_override=True if idx == 0 else False,
-                                # normals=self.cloud_normals_mid, dynamic_r_query=self.dynamic_r_query['mid'],
                                 normals=self.cloud_normals, dynamic_r_query=self.dynamic_r_query,
                                 cloud_pos=cloud_pos_dict, exposure_feat=self.exposure_feat,
                                 cur_total_iters=num_joint_iters, save_rendered_image=True if self.save_rendered_image else False)
 
+        # update features
         if self.frustum_feature_selection:
             self.npc.update_geo_feats(geo_feats_fine, indices=indices_geo_fine, level='fine')
             self.npc.update_geo_feats(geo_feats_mid, indices=indices_geo_mid, level='mid')
             self.npc.update_col_feats(col_feats_fine, indices=indices_col_fine, level='fine')
             self.npc.update_col_feats(col_feats_mid, indices=indices_col_mid, level='mid')
-
         else:
             self.npc.update_geo_feats(geo_feats_fine, level='fine')
             self.npc.update_geo_feats(geo_feats_mid, level='mid')
