@@ -241,6 +241,7 @@ All configs can be found under the `./configs` folder.
 - Take into account that the settings specified in `point_slam.yaml` will be overwritten by those in `scannet.yaml` if they share the same key values.
 - Exercise caution when modifying variables to ensure that you are changing the intended ones.
 ## Run
+Before running, make sure read the `Configs` section and modify all necessary configs for your running.
 To run on the ScanNet, for example, scene0181, use the following command,
 ```
 python run.py configs/ScanNet/scene0181.yaml
@@ -249,7 +250,7 @@ python run.py configs/ScanNet/scene0181.yaml
 Please remember to modify the `--output`, `--error`, `source [conda env path]`, `output_affix`, etc. inside `repro_demo.sh`, as well as the `wandb_dir` in `configs/ScanNet/point_slam.yaml`
 ```
 cd $SCRATCH/Hierarchical-Point-SLAM
-sbatch repro_euler.sh   # run the job, remember to check args before each run
+sbatch repro_demo.sh   # run the job, remember to check args before each run
 ```
 ## Acknowledgement
 This project was undertaken as part of the 2023HS 3DV course at ETH Zurich. We would like to express our sincere appreciation for the valuable guidance and support provided by our supervisor, [Erik Sandström](https://github.com/eriksandstroem).

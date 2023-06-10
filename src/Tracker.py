@@ -443,10 +443,6 @@ class Tracker(object):
                         candidate_cam_tensor = camera_tensor.clone().detach()
                         idx_loss_camera_tensor = torch.abs(gt_camera_tensor.to(
                             device)-candidate_cam_tensor)
-                        
-                        print(f'idx:{idx}, current_min loss: {current_min_loss:.2f}',
-                              'camera_quad_error:', idx_loss_camera_tensor[:4].mean().item(),
-                              'camera_pos_error:', idx_loss_camera_tensor[-3:].mean().item())
                     
                     if cam_iter == self.num_cam_iters-1:
                         idx_loss_camera_tensor = torch.abs(gt_camera_tensor.to(

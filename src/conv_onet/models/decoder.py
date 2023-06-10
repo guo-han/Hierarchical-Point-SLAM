@@ -638,18 +638,14 @@ class NICER(nn.Module):
                  hidden_size=128,
                  pos_embedding_method='fourier', use_normals=False, use_view_direction=False):
         super().__init__()
-
+        # initialize decoders for the geometry and color for two levels
         self.geo_decoder_mid = MLP_geometry(name='geometry_mid', cfg=cfg, dim=dim, c_dim=c_dim, color=False,
                                         skips=[2], n_blocks=5, hidden_size=32,
                                         use_normals=False, pos_embedding_method=pos_embedding_method,level='mid')
-        # self.geo_decoder_fine = MLP_geometry(name='geometry_fine', cfg=cfg, dim=dim, c_dim=c_dim*2, color=False,
+
         self.geo_decoder_fine = MLP_geometry(name='geometry_fine', cfg=cfg, dim=dim, c_dim=c_dim, color=False,
                                         skips=[2], n_blocks=5, hidden_size=32,
                                         use_normals=False, pos_embedding_method=pos_embedding_method,level='fine')
-        #self.color_decoder = MLP_color(name='color', cfg=cfg, dim=dim, c_dim=c_dim, color=True,
-        #                              skips=[2], n_blocks=5, hidden_size=hidden_size,
-        #                               use_normals=use_normals, pos_embedding_method=pos_embedding_method,
-        #                               use_view_direction=cfg['use_view_direction'],level='fine')
         
         self.color_decoder_mid = MLP_color(name='color_mid', cfg=cfg, dim=dim, c_dim=c_dim, color=True,
                                       skips=[2], n_blocks=5, hidden_size=hidden_size,
@@ -681,6 +677,7 @@ class NICER(nn.Module):
 
         """
         device = f'cuda:{p.get_device()}'
+        # for different stage (geometry/color, coarse/fine levels), apply different decoders to the input features.
         match stage:
             case 'geometry_mid':
                 geo_occ_mid, ray_mask, point_mask = self.geo_decoder_mid(p, npc, npc_geo_feats, npc_col_feats,
@@ -695,11 +692,6 @@ class NICER(nn.Module):
                 geo_occ_fine, ray_mask, point_mask = self.geo_decoder_fine(p, npc, npc_geo_feats, npc_col_feats,
                                                                  pts_num=pts_num, is_tracker=is_tracker, cloud_pos=cloud_pos,
                                                                  dynamic_r_query=dynamic_r_query)
-                
-                
-                # geo_occ_mid, ray_mask, point_mask = self.geo_decoder_mid(p, npc, npc_geo_feats, npc_col_feats,
-                #                                                  pts_num=pts_num, is_tracker=is_tracker, cloud_pos=cloud_pos,
-                #                                                  dynamic_r_query=dynamic_r_query)
                 
                 raw = torch.zeros(
                     geo_occ_fine.shape[0], 4, device=device, dtype=torch.float)
