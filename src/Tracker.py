@@ -74,11 +74,6 @@ class Tracker(object):
         self.check_color_consistancy = cfg['tracking']['check_color_consistancy']
 
         self.radius_hierarchy = cfg['pointcloud']['radius_hierarchy']
-        
-        self.dynamic_r_add_fine = None
-        self.dynamic_r_query_fine = None
-        self.dynamic_r_add_mid = None
-        self.dynamic_r_query_mid = None
 
         self.radius_query_ratio = cfg['pointcloud']['radius_query_ratio']
         self.color_grad_threshold = cfg['pointcloud']['color_grad_threshold']
