@@ -185,8 +185,9 @@ class Tracker(object):
             batch_gt_color = batch_gt_color[inside_mask]
             for key in self.radius_hierarchy.keys():
                 batch_r_query[key] = batch_r_query[key][inside_mask] if self.use_dynamic_radius else None
-            
-        if progress <  self.ratio_iter_mid:
+        # For the first 50% of the iterations, we use the coarse level point cloud
+        # to optimize the tracker
+        if progress <  self.ratio_iter_mid: 
             
             ret = self.renderer.render_batch_ray(npc, self.decoders, batch_rays_d, batch_rays_o,
                                                 device, stage='color_mid',  gt_depth=batch_gt_depth,
@@ -197,7 +198,7 @@ class Tracker(object):
                                                 dynamic_r_query=batch_r_query,
                                                 exposure_feat=self.exposure_feat)
             depth, uncertainty, color, _ = ret
-        
+        # For the second half, we use the fine level point cloud to optimize the tracker.
         else:
             ret = self.renderer.render_batch_ray(npc, self.decoders, batch_rays_d, batch_rays_o,
                                                 device, stage='color_fine',  gt_depth=batch_gt_depth,
@@ -277,7 +278,7 @@ class Tracker(object):
                        group=f'slam_{scene_name}' if (
                            self.cfg['project_name'] == 'NICER_SLAM_replica' or self.cfg['project_name'] == 'NICER_SLAM_report') else run_name,
                        name='tracker_'+dt_string, settings=wandb.Settings(code_dir="."),
-                       dir=self.cfg['wandb_dir'], tags=[scene_name])    # '/cluster/scratch/guohan/point-slam/output'
+                       dir=self.cfg['wandb_dir'], tags=[scene_name])
 
         if self.verbose:
             pbar = self.frame_loader
@@ -301,18 +302,7 @@ class Tracker(object):
                 color_grad_mag = np.sqrt(grad_x**2 + grad_y**2)
                 color_grad_mag = np.clip(
                     color_grad_mag, 0.0, self.color_grad_threshold)
-                '''
-                fn_map_r_add = interp1d([0, 0.01, self.color_grad_threshold], [
-                                        self.radius_add_max, self.radius_add_max, self.radius_add_min])
-                fn_map_r_query = interp1d([0, 0.01, self.color_grad_threshold], [
-                                          ratio*self.radius_add_max, ratio*self.radius_add_max, ratio*self.radius_add_min])
-                dynamic_r_add = fn_map_r_add(color_grad_mag)
-                dynamic_r_query = fn_map_r_query(color_grad_mag)
-                self.dynamic_r_add, self.dynamic_r_query = torch.from_numpy(dynamic_r_add).to(
-                    self.device), torch.from_numpy(dynamic_r_query).to(self.device)
-                torch.save(self.dynamic_r_query,
-                           f'{self.output}/dynamic_r_frame/r_query_{idx:05d}.pt')
-                '''
+
 
 
                 # hierarchy level dynamic radius
@@ -457,10 +447,6 @@ class Tracker(object):
                         print(f'idx:{idx}, current_min loss: {current_min_loss:.2f}',
                               'camera_quad_error:', idx_loss_camera_tensor[:4].mean().item(),
                               'camera_pos_error:', idx_loss_camera_tensor[-3:].mean().item())
-                    
-                    if cam_iter == self.ratio_iter_mid*self.num_cam_iters-1:
-                        current_min_loss = loss
-                        candidate_cam_tensor = camera_tensor.clone().detach()
                     
                     if cam_iter == self.num_cam_iters-1:
                         idx_loss_camera_tensor = torch.abs(gt_camera_tensor.to(
