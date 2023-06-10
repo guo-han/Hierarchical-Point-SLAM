@@ -1,0 +1,8 @@
+inherit_from: configs/ScanNet/scannet.yaml
+config_path: configs/ScanNet/scene0181.yaml
+mapping:
+  bound: [[-1.0, 8.9], [-0.9, 8.0], [-1.0, 3.6]]
+  marching_cubes_bound: [[-1.0, 8.9], [-0.9, 8.0], [-1.0, 3.6]]
+data:
+  input_folder: /cluster/project/infk/courses/252-0579-00L/group10_2023/scannet/scene0181_00
+  output: /scratch_net/biwidl212_second/liyueli/output/nicer-slam/ScanNet/scene0181
