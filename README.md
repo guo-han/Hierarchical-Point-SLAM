@@ -124,24 +124,18 @@ Please follow the data downloading procedure on the [ScanNet](http://www.scan-ne
 </details>
 
 
-We use the following sequences: 
+We use the scene 0025 in ScanNet as demo: 
 ```
 scene0025_02
-scene0059_00
-scene0062_00
-scene0103_00
-scene0106_00
-scene0126_00
-scene0181_00
-scene0207_00
 ```
 For configs, please remember to check and modify the `input_folder` path.
 ## Run
-To run on the ScanNet, for example, scene0059, use the following command,
+To run on the ScanNet, for example, scene0025, use the following command,
 ```
-python run.py configs/ScanNet/scene0059.yaml
+python run.py configs/ScanNet/scene0025.yaml
 ```
 ### Run on Euler Cluster
+Please remember to modify the Paths inside repro_demo.sh, as well as the `wandb_dir` in configs/ScanNet/point_slam.yaml
 ```
 cd $SCRATCH/point-slam-local
 sbatch repro_euler.sh   # run the job, remember to check args before each run
