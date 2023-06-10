@@ -28,7 +28,22 @@ The pipeline of hierarchical Point-SLAM
         <li>In tracking: begin by optimizing camera pose using coarse-level features, and subsequently integrate fine-level features for more refined enhancements.</li>
     </ul>
 </p>
-<br>
+
+<p align="center">
+  <a href="">
+    <img src="./imgs/result_table.png" alt="Logo" width="90%">
+  </a>
+</p>
+
+
+<div align = "center">
+<img align="center"  src="./imgs/master.png" width="300">  <img align="center"  src="./imgs/ours.png"  width="280">
+</div>
+
+<p align="center">
+A comparison of the resulting neural point cloud
+taken from ScanNet scene 0181 at the frame 2438. Left: master. Right: Ours.
+</p>
 
 <details open="open" style='padding: 10px; border-radius:5px 30px 30px 5px; border-style: solid; border-width: 1px;'>
   <summary>Table of Contents</summary>
@@ -124,9 +139,9 @@ Please follow the data downloading procedure on the [ScanNet](http://www.scan-ne
 </details>
 
 
-We use the scene 0025 in ScanNet as demo: 
+We use the scene 0181 in ScanNet as demo: 
 ```
-scene0025_02
+scene0181
 ```
 ## Configs
 All configs can be found under the `./configs` folder.
@@ -155,9 +170,9 @@ All configs can be found under the `./configs` folder.
 - Take into account that the settings specified in `point_slam.yaml` will be overwritten by those in `scannet.yaml` if they share the same key values.
 - Exercise caution when modifying variables to ensure that you are changing the intended ones.
 ## Run
-To run on the ScanNet, for example, scene0025, use the following command,
+To run on the ScanNet, for example, scene0181, use the following command,
 ```
-python run.py configs/ScanNet/scene0025.yaml
+python run.py configs/ScanNet/scene0181.yaml
 ```
 ### Run on Euler Cluster
 Please remember to modify the Paths inside repro_demo.sh, as well as the `wandb_dir` in configs/ScanNet/point_slam.yaml

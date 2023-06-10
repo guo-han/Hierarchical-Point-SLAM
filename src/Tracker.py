@@ -74,11 +74,6 @@ class Tracker(object):
         self.check_color_consistancy = cfg['tracking']['check_color_consistancy']
 
         self.radius_hierarchy = cfg['pointcloud']['radius_hierarchy']
-        
-        self.dynamic_r_add_fine = None
-        self.dynamic_r_query_fine = None
-        self.dynamic_r_add_mid = None
-        self.dynamic_r_query_mid = None
 
         self.radius_query_ratio = cfg['pointcloud']['radius_query_ratio']
         self.color_grad_threshold = cfg['pointcloud']['color_grad_threshold']
@@ -337,7 +332,7 @@ class Tracker(object):
                     self.dynamic_r_add[level], self.dynamic_r_query[level] = torch.from_numpy(dynamic_r_add).to(
                         self.device), torch.from_numpy(dynamic_r_query).to(self.device)
      
-                    # torch.save(self.dynamic_r_query[level], f'{self.output}/dynamic_r_frame/r_query_{idx:05d}_{level}.pt')
+                    torch.save(self.dynamic_r_query[level], f'{self.output}/dynamic_r_frame/r_query_{idx:05d}_{level}.pt')
 
             if self.sample_with_color_grad or self.sample_depth_and_color:
                 H, W, fx, fy, cx, cy = self.H, self.W, self.fx, self.fy, self.cx, self.cy
