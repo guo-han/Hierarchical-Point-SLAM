@@ -136,9 +136,9 @@ scene0207_00
 ```
 For configs, please remember to check and modify the `input_folder` path.
 ## Run
-To run on the ScanNet, for example, scene0059, use the following command,
+To run on the ScanNet, for example, scene0025, use the following command,
 ```
-python run.py configs/ScanNet/scene0059.yaml
+python run.py configs/ScanNet/scene0025.yaml
 ```
 ### Run on Euler Cluster
 ```
