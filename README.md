@@ -254,4 +254,4 @@ cd $SCRATCH/Hierarchical-Point-SLAM
 sbatch repro_demo.sh   # run the job, remember to check args before each run
 ```
 ## Acknowledgement
-This project was undertaken as part of the 2023HS 3DV course at ETH Zurich. We would like to express our sincere appreciation for the valuable guidance and support provided by our supervisor, [Erik Sandström](https://github.com/eriksandstroem).
+This project was undertaken as part of the 2023FS 3DV course at ETH Zurich. We would like to express our sincere appreciation for the valuable guidance and support provided by our supervisor, [Erik Sandström](https://github.com/eriksandstroem).
